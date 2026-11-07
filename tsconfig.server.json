@@ -1,0 +1,11 @@
+{
+  "extends": "./tsconfig.json",
+  "include": [
+    "server",
+    "shared",
+    "functions",
+    "scripts",
+    "tests/domain.test.ts",
+    "tests/integration.test.ts"
+  ]
+}

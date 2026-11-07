@@ -1,0 +1,10 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "sourdough-made-sweet",
+  "pages_build_output_dir": "dist",
+  "compatibility_date": "2026-06-01",
+  "compatibility_flags": ["nodejs_compat"],
+  "hyperdrive": [{"binding":"HYPERDRIVE","id":"00000000000000000000000000000000"}],
+  "r2_buckets": [{"binding":"PRODUCT_IMAGES","bucket_name":"sourdough-product-images"}],
+  "vars": {"APP_ENV":"production","ORDER_NOTIFICATION_EMAIL":"orders@sourdoughmadesweet.com"}
+}

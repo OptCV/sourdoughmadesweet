@@ -1,0 +1,1 @@
+ALTER TABLE "products" ADD COLUMN "is_cookie_flavor" boolean DEFAULT false NOT NULL;

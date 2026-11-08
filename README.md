@@ -1,5 +1,9 @@
 # Sourdough Made Sweet Bakehouse
 
+## Navigation customization
+
+Every active category appears automatically under **Our menu**, following its catalog display order. **Settings → Navigation** lets the owner rename that button and choose up to two shortcuts for wide screens. Smaller desktop widths keep the complete dropdown; phones show a flat expandable list and a visible Order button. Archived categories disappear automatically. Hero/footer/cart menu links follow the first active category. These preferences use the existing settings JSON, so this update requires no new database migration. Reload public pages after saving (catalog caching can take up to 30 seconds).
+
 A cottage bakery storefront and private owner workspace. Customers submit requests; the bakery confirms availability, fulfillment and payment separately. No checkout payment or customer accounts.
 
 ## Implementation and verification status

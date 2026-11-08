@@ -1,5 +1,17 @@
 # The Modern Artisan Bakehouse
 
+## Navigation
+
+The header grows with the catalog without growing into a row of competing links. Desktop navigation contains Home, an “Our menu” disclosure containing every active category in catalog display order, and the order CTA. Categories use their current database names and slugs. New categories appear automatically; archived/inactive categories disappear. Category links are ordinary anchors in semantic lists, not application-menu widgets.
+
+Settings → Navigation lets the owner rename the disclosure (1–24 characters) and optionally choose up to two category shortcuts. Shortcuts supplement the complete menu; they never exclude other categories. Selection order determines shortcut order. Inactive/deleted shortcut IDs are ignored publicly and can be cleared in Settings. Existing settings default to “Our menu” with no shortcuts. No additional category flags or migration are required.
+
+At 1100px and above, optional shortcuts appear beside the disclosure, with long labels truncated visually and full labels available in the complete menu. From 768–1099px, omit shortcuts and retain the compact desktop disclosure plus order CTA. Below 768px, show the mobile toggle, compact Order button and a flat expandable category list. The mobile button and panel must never appear at desktop widths; component-specific selectors override generic icon-button layout rules. Menus have bounded scrolling for long catalogs, wrap full category names, and preserve large tap targets.
+
+Use a real button with aria-expanded/aria-controls, ordinary Tab navigation and Enter/Space activation. Escape closes the open disclosure and returns focus to its button. Outside clicks, focus leaving the header, and link selection close it. Selecting a section moves focus to that section without a second scroll. Crossing the mobile/desktop breakpoint clears open state and moves focus to the visible toggle if needed. Hidden links must not remain keyboard-accessible. No hover-only activation or modal focus trap. This follows the [W3C disclosure navigation pattern](https://www.w3.org/WAI/ARIA/apg/patterns/disclosure/examples/disclosure-navigation/).
+
+Hero, footer and empty-cart menu links target the first active category, with a safe main-content fallback while the catalog is unavailable. Do not hardcode Breads, Sweet Treats or Cookie Flights in navigation. Verify many categories, long names, renamed slugs, inactive categories, keyboard dismissal and the 767/768px boundary alongside the standard responsive sizes.
+
 “A thoughtfully crafted digital storefront inspired by warm kitchens, fresh sourdough, rustic baking traditions, and understated boutique elegance.”
 
 ## Philosophy
@@ -36,7 +48,7 @@ Maximum content width 1240px. Container padding 24px mobile, 40px tablet, 64px w
 
 ## Components
 
-- Navbar: cream, thin bottom rule, sticky, logo/text left; restrained links and filled CTA right. Mobile menu button is labeled, exposes expanded state, closes after selection. Touch targets at least 44px.
+- Navbar: shared page surface, thin bottom rule, sticky logo/text left, automatic category disclosure and an always-visible order CTA. The owner may add up to two wide-screen shortcuts. Mobile navigation uses a single flat list; see Navigation below. Touch targets are at least 44px.
 - Logo: preserve supplied proportions; maximum 190px wide. Until supplied, use an explicitly temporary plain business-name wordmark, never a fabricated SMS logo.
 - Hero: eyebrow, expressive H1, readable subtitle and two wrapping CTAs. Editorial photography window has rounded upper corners and a thin gold outline; pending photography is clearly labeled.
 - Buttons: minimum 44px high, 12px 22px padding, 4px radius, 180ms transition. Disabled opacity .55 plus disabled semantics. Loading text explains progress.

@@ -1,3 +1,4 @@
+import { NavigationEditor } from "../components/NavigationEditor";
 import { useEffect, useState, type FormEvent } from "react";
 import { useNavigate } from "react-router";
 import {
@@ -1004,6 +1005,7 @@ export function Admin() {
             {tab === "Settings" && (
               <SettingsEditor
                 settings={data.settings}
+                categories={data.categories}
                 media={media}
                 busy={busy}
                 save={(value) =>
@@ -1085,12 +1087,14 @@ function Upload({
   );
 }
 function SettingsEditor({
+  categories,
   media,
   settings,
   busy,
   save,
 }: {
   settings: Settings;
+  categories: Category[];
   media: Media[];
   busy: boolean;
   save: (value: Settings) => Promise<void>;
@@ -1104,6 +1108,11 @@ function SettingsEditor({
         void save(value);
       }}
     >
+      <NavigationEditor
+        value={value.navigation}
+        categories={categories}
+        onChange={(navigation) => setValue({ ...value, navigation })}
+      />
       <AppearanceEditor
         value={value.appearance}
         media={media}

@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { navigationInput } from "./navigation";
 import { appearanceSchema, sectionStyleSchema } from "./appearance";
 export const availability = z.enum([
   "available",
@@ -52,6 +53,7 @@ export const flightInput = z.object({
   eligibleProductIds: z.array(z.string().uuid()).max(40),
 });
 export const settingsInput = z.object({
+  navigation: navigationInput.optional(),
   appearance: appearanceSchema.optional(),
   displayName: name,
   contactEmail: z.union([z.email(), z.literal("")]),

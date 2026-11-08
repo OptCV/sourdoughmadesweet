@@ -7,6 +7,7 @@ import "@fontsource/dm-sans/400.css";
 import "@fontsource/dm-sans/500.css";
 import "@fontsource/dm-sans/600.css";
 import "./styles/main.css";
+import "./styles/navigation.css";
 import { Home } from "./pages/Home";
 import { Admin, Login } from "./pages/Admin";
 createRoot(document.getElementById("root")!).render(

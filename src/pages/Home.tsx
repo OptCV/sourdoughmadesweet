@@ -1,7 +1,7 @@
 import { useEffect, useState, type CSSProperties } from "react";
 import { appearanceSchema, sectionVariables } from "../../shared/appearance";
 import { useBrand } from "../hooks/useBrand";
-import { ArrowRight, Menu, X, ShoppingBag, Heart, Wheat } from "lucide-react";
+import { ArrowRight, X, Heart, Wheat } from "lucide-react";
 import { z } from "zod";
 import {
   type Catalog,
@@ -10,6 +10,8 @@ import {
 } from "../../shared/contracts";
 import { api } from "../lib/api";
 import { ProductCard, FlightBuilder, Photo } from "../components/Catalog";
+import { Navigation } from "../components/Navigation";
+import { navigationCategories } from "../../shared/navigation";
 import { Checkout } from "../components/Checkout";
 const draftSchema = z
   .array(
@@ -35,7 +37,6 @@ function initialCart(): CartItem[] {
 export function Home() {
   const [data, setData] = useState<Catalog>();
   const [error, setError] = useState("");
-  const [menu, setMenu] = useState(false);
   const [cart, setCart] = useState<CartItem[]>(initialCart);
   const [notice, setNotice] = useState("");
   useBrand(data?.settings.appearance);
@@ -66,12 +67,7 @@ export function Home() {
     setNotice(`${item.name} added to your order.`);
   };
   const hero = data?.products.find((p) => p.isFeatured && p.primaryImageId);
-  const links = [
-    ["Home", "home"],
-    ["Breads", "breads"],
-    ["Sweet Treats", "sweet-treats"],
-    ["Cookie Flights", "cookie-flights"],
-  ];
+  const menuTarget = navigationCategories(data?.categories ?? [])[0]?.slug;
   return (
     <>
       <a className="skip-link" href="#main">
@@ -80,42 +76,13 @@ export function Home() {
       {data?.settings.announcement && (
         <div className="announcement">{data.settings.announcement}</div>
       )}
-      <header className="header">
-        <div className="nav container">
-          <a
-            href="#home"
-            className="wordmark"
-            aria-label="Sourdough Made Sweet Bakehouse home"
-          >
-            Sourdough <i>Made Sweet</i>
-            <small>BAKEHOUSE</small>
-          </a>
-          <nav aria-label="Main navigation" className={menu ? "open" : ""}>
-            {links.map(([label, id]) => (
-              <a key={id} href={`#${id}`} onClick={() => setMenu(false)}>
-                {label}
-              </a>
-            ))}
-            <a href="#order" onClick={() => setMenu(false)}>
-              Order
-            </a>
-          </nav>
-          <a className="button nav-cta" href="#order">
-            Request an Order <ShoppingBag size={15} />
-            {cart.length > 0 && (
-              <span>{cart.reduce((n, i) => n + i.quantity, 0)}</span>
-            )}
-          </a>
-          <button
-            className="mobile-toggle icon-button"
-            aria-label={menu ? "Close navigation" : "Open navigation"}
-            aria-expanded={menu}
-            onClick={() => setMenu(!menu)}
-          >
-            {menu ? <X /> : <Menu />}
-          </button>
-        </div>
-      </header>
+      <Navigation
+        categories={data?.categories ?? []}
+        settings={data?.settings.navigation}
+        count={cart.reduce((total, item) => total + item.quantity, 0)}
+        loading={!data && !error}
+      />
+
       <main id="main">
         <section
           id="home"
@@ -136,7 +103,10 @@ export function Home() {
               <h1>{appearance.heroHeading}</h1>
               {appearance.heroSubheading && <p>{appearance.heroSubheading}</p>}
               <div className="hero-actions">
-                <a className="button" href="#breads">
+                <a
+                  className="button"
+                  href={menuTarget ? `#${menuTarget}` : "#main"}
+                >
                   Explore Our Menu <ArrowRight size={18} />
                 </a>
                 <a className="button outline" href="#order">
@@ -275,7 +245,12 @@ export function Home() {
                 <p>{data.settings.orderingInstructions}</p>
               )}
             </section>
-            <Checkout cart={cart} setCart={setCart} settings={data.settings} />
+            <Checkout
+              cart={cart}
+              setCart={setCart}
+              settings={data.settings}
+              menuHref={menuTarget ? `#${menuTarget}` : "#main"}
+            />
           </>
         )}
       </main>
@@ -292,7 +267,7 @@ export function Home() {
               Baked fresh. Shared with joy.
             </p>
             <div>
-              <a href="#breads">Our menu</a>
+              <a href={menuTarget ? `#${menuTarget}` : "#main"}>Our menu</a>
               <a href="#order">Request an order</a>
               {data?.settings.contactEmail && (
                 <a href={`mailto:${data.settings.contactEmail}`}>

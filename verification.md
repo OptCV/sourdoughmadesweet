@@ -1,5 +1,13 @@
 # Verification record
 
+## Navigation update — November 8, 2026
+
+- TypeScript, Vite production build and ESLint passed.
+- 30 Vitest tests passed, including PostgreSQL persistence of navigation settings and preservation when older clients omit them.
+- Six Playwright tests passed in Microsoft Edge. Navigation coverage includes 18 categories, long labels, catalog order, dynamic anchor targets, optional shortcuts, keyboard activation/Tab/Escape, outside-click dismissal, mobile scrolling, selection focus and desktop/mobile resize behavior.
+- Desktop toggle visibility checked at 768, 1024, 1100 and 1440px; mobile navigation checked at 360 and 390px. The generic icon-button display rule no longer makes the mobile toggle visible on desktop.
+- No schema migration or production deployment was needed/performed for this change.
+
 ## Customization update — November 8, 2026
 
 - Full TypeScript check, Vite production build, ESLint and diff whitespace checks passed.

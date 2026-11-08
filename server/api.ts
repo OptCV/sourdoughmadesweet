@@ -416,6 +416,7 @@ app.patch("/api/admin/settings", async (c) => {
         .where(eq(s.settings.id, 1));
       // Older clients updating business details must not erase saved branding.
       value.appearance ??= existing?.value.appearance;
+      value.navigation ??= existing?.value.navigation;
       await db.update(s.settings).set({ value }).where(eq(s.settings.id, 1));
     },
   );

@@ -304,6 +304,46 @@ describe.skipIf(!url)(
         await pool.end();
       }
     });
+    it("persists navigation preferences and preserves them for older settings clients", async () => {
+      const navigation = {
+        menuLabel: "Fresh from the oven",
+        shortcutCategoryIds: data.categories.slice(0, 2).map((c) => c.id),
+      };
+      expect(
+        (
+          await request(
+            "/admin/settings",
+            "PATCH",
+            { ...data.settings, navigation },
+            true,
+          )
+        ).status,
+      ).toBe(200);
+      const updated = (await (await request("/catalog")).json()) as Catalog;
+      expect(updated.settings.navigation).toEqual(navigation);
+      expect(
+        (
+          await request(
+            "/admin/settings",
+            "PATCH",
+            { ...data.settings, navigation: undefined },
+            true,
+          )
+        ).status,
+      ).toBe(200);
+      const retained = (await (await request("/catalog")).json()) as Catalog;
+      expect(retained.settings.navigation).toEqual(navigation);
+      expect(
+        (
+          await request(
+            "/admin/settings",
+            "PATCH",
+            { ...data.settings, navigation: { ...navigation, menuLabel: " " } },
+            true,
+          )
+        ).status,
+      ).toBe(400);
+    });
     it("persists an immutable order, survives email failure and deduplicates retries", async () => {
       const p = data.products.find(
         (p) => p.availabilityStatus === "available" && p.variants.length,

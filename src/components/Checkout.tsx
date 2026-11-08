@@ -25,10 +25,12 @@ export function Checkout({
   cart,
   setCart,
   settings,
+  menuHref = "#main",
 }: {
   cart: CartItem[];
   setCart: (items: CartItem[]) => void;
   settings: Settings;
+  menuHref?: string;
 }) {
   const [result, setResult] = useState("");
   const [error, setError] = useState("");
@@ -340,7 +342,7 @@ export function Checkout({
             <p>
               Your favorites belong here.
               <br />
-              <a href="#breads">Explore the menu →</a>
+              <a href={menuHref}>Explore the menu →</a>
             </p>
           )}
           {cart.map((item, index) => (

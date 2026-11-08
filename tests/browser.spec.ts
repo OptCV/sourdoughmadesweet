@@ -13,6 +13,7 @@ test("owner can edit and save centralized brand and hero controls", async ({
     leadTimeGuidance: "",
     announcement: "",
     appearance: defaultAppearance,
+    navigation: { menuLabel: "Our menu", shortcutCategoryIds: [] },
   };
   await page.route("**/api/admin/**", async (route) => {
     const path = new URL(route.request().url()).pathname;
@@ -28,6 +29,9 @@ test("owner can edit and save centralized brand and hero controls", async ({
   await page.goto("/admin");
   await page.getByRole("button", { name: "Settings", exact: true }).click();
   await page
+    .getByLabel("Menu button label", { exact: true })
+    .fill("Browse our bakes");
+  await page
     .getByRole("textbox", { name: "Hero heading", exact: true })
     .fill("Your neighborhood bakehouse");
   await page
@@ -42,6 +46,7 @@ test("owner can edit and save centralized brand and hero controls", async ({
   await expect(page.getByRole("status")).toHaveText("Saved successfully.");
   expect(settings.appearance.heroHeading).toBe("Your neighborhood bakehouse");
   expect(settings.appearance.primary).toBe("#123456");
+  expect(settings.navigation.menuLabel).toBe("Browse our bakes");
   await expect(page.locator(".admin-nav")).toHaveCSS(
     "background-color",
     "rgb(18, 52, 86)",

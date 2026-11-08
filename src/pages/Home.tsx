@@ -1,4 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type CSSProperties } from "react";
+import { appearanceSchema, sectionVariables } from "../../shared/appearance";
+import { useBrand } from "../hooks/useBrand";
 import { ArrowRight, Menu, X, ShoppingBag, Heart, Wheat } from "lucide-react";
 import { z } from "zod";
 import {
@@ -36,6 +38,8 @@ export function Home() {
   const [menu, setMenu] = useState(false);
   const [cart, setCart] = useState<CartItem[]>(initialCart);
   const [notice, setNotice] = useState("");
+  useBrand(data?.settings.appearance);
+  const appearance = appearanceSchema.parse(data?.settings.appearance ?? {});
   useEffect(() => {
     api<Catalog>("/catalog")
       .then(setData)
@@ -113,37 +117,48 @@ export function Home() {
         </div>
       </header>
       <main id="main">
-        <section id="home" className="hero container">
-          <div>
-            <span className="eyebrow">HANDCRAFTED WITH LOVE</span>
-            <h1>
-              Sourdough Bread &amp; Sweets <i>Made Fresh</i>
-            </h1>
-            <p>
-              Welcome to our cottage food bakery. Guaranteed Fresh Sourdough
-              Breads &amp; Sweets made to Order
-            </p>
-            <div className="hero-actions">
-              <a className="button" href="#breads">
-                Explore Our Menu <ArrowRight size={18} />
-              </a>
-              <a className="button outline" href="#order">
-                Request an Order
-              </a>
+        <section
+          id="home"
+          className={`custom-section hero-section ${appearance.heroBackground.backgroundImageId ? "has-background-image" : ""}`}
+          style={
+            sectionVariables(
+              appearance,
+              "cream",
+              appearance.heroBackground,
+            ) as CSSProperties
+          }
+        >
+          <div className="hero container section-content">
+            <div>
+              {appearance.heroEyebrow && (
+                <span className="eyebrow">{appearance.heroEyebrow}</span>
+              )}
+              <h1>{appearance.heroHeading}</h1>
+              {appearance.heroSubheading && <p>{appearance.heroSubheading}</p>}
+              <div className="hero-actions">
+                <a className="button" href="#breads">
+                  Explore Our Menu <ArrowRight size={18} />
+                </a>
+                <a className="button outline" href="#order">
+                  Request an Order
+                </a>
+              </div>
+              <div className="hero-note">
+                <span /> A little flour. A lot of heart.
+              </div>
             </div>
-            <div className="hero-note">
-              <span /> A little flour. A lot of heart.
+            <div className="hero-art">
+              <Photo
+                id={hero?.primaryImageId ?? null}
+                alt={hero?.imageAlt ?? hero?.name ?? ""}
+              />
+              <div className="seal">
+                FRESHLY MADE<span>✧</span>MADE TO ORDER
+              </div>
+              <span className="art-caption">
+                SLOWLY CRAFTED. SWEETLY SHARED.
+              </span>
             </div>
-          </div>
-          <div className="hero-art">
-            <Photo
-              id={hero?.primaryImageId ?? null}
-              alt={hero?.imageAlt ?? hero?.name ?? ""}
-            />
-            <div className="seal">
-              FRESHLY MADE<span>✧</span>MADE TO ORDER
-            </div>
-            <span className="art-caption">SLOWLY CRAFTED. SWEETLY SHARED.</span>
           </div>
         </section>
         <div className="intro-strip">
@@ -173,9 +188,16 @@ export function Home() {
               <section
                 key={category.id}
                 id={category.slug}
-                className={`section theme-${category.theme}`}
+                className={`section custom-section ${category.style?.backgroundImageId ? "has-background-image" : ""}`}
+                style={
+                  sectionVariables(
+                    appearance,
+                    category.theme,
+                    category.style,
+                  ) as CSSProperties
+                }
               >
-                <div className="container">
+                <div className="container section-content">
                   <div className="section-heading">
                     <div>
                       <span className="eyebrow">

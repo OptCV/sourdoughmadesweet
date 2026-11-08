@@ -1,5 +1,11 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { useNavigate } from "react-router";
+import {
+  AppearanceEditor,
+  BackgroundEditor,
+} from "../components/AppearanceEditor";
+import { appearanceSchema } from "../../shared/appearance";
+import { useBrand } from "../hooks/useBrand";
 import { Plus, LogOut, ArrowLeft } from "lucide-react";
 import { api, mutate } from "../lib/api";
 import {
@@ -70,6 +76,15 @@ const slug = (value: string) =>
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/-$/, "");
 export function Login() {
+  const [siteSettings, setSiteSettings] = useState<Settings>();
+  useBrand(siteSettings?.appearance);
+  useEffect(() => {
+    api<Catalog>("/catalog")
+      .then((c) => setSiteSettings(c.settings))
+      .catch(() => {
+        /* Sign-in remains available if the catalog is offline. */
+      });
+  }, []);
   const navigate = useNavigate();
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
@@ -126,6 +141,7 @@ export function Admin() {
   const navigate = useNavigate();
   const [tab, setTab] = useState("Overview");
   const [data, setData] = useState<Catalog>();
+  useBrand(data?.settings.appearance);
   const [orders, setOrders] = useState<Order[]>([]);
   const [media, setMedia] = useState<Media[]>([]);
   const [category, setCategory] = useState<Category | null>(null);
@@ -365,7 +381,7 @@ export function Admin() {
                     />
                   </label>
                   <label>
-                    Theme
+                    Inherit brand color
                     <select
                       value={category.theme}
                       onChange={(e) =>
@@ -376,10 +392,36 @@ export function Admin() {
                       }
                     >
                       {["cream", "chocolate", "gold"].map((v) => (
-                        <option key={v}>{v}</option>
+                        <option key={v} value={v}>
+                          {
+                            (
+                              {
+                                cream: "Page background",
+                                chocolate: "Primary brand color",
+                                gold: "Accent brand color",
+                              } as Record<string, string>
+                            )[v]
+                          }
+                        </option>
                       ))}
                     </select>
                   </label>
+                  <BackgroundEditor
+                    value={category.style}
+                    media={media}
+                    fallback={
+                      appearanceSchema.parse(data.settings.appearance ?? {})[
+                        (
+                          {
+                            cream: "background",
+                            chocolate: "primary",
+                            gold: "accent",
+                          } as const
+                        )[category.theme]
+                      ]
+                    }
+                    onChange={(style) => setCategory({ ...category, style })}
+                  />
                   <label>
                     Display order
                     <input
@@ -962,6 +1004,7 @@ export function Admin() {
             {tab === "Settings" && (
               <SettingsEditor
                 settings={data.settings}
+                media={media}
                 busy={busy}
                 save={(value) =>
                   run(() => mutate("/admin/settings", value, "PATCH"))
@@ -1042,11 +1085,13 @@ function Upload({
   );
 }
 function SettingsEditor({
+  media,
   settings,
   busy,
   save,
 }: {
   settings: Settings;
+  media: Media[];
   busy: boolean;
   save: (value: Settings) => Promise<void>;
 }) {
@@ -1059,6 +1104,11 @@ function SettingsEditor({
         void save(value);
       }}
     >
+      <AppearanceEditor
+        value={value.appearance}
+        media={media}
+        onChange={(appearance) => setValue({ ...value, appearance })}
+      />
       {(
         [
           "displayName",

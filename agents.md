@@ -45,7 +45,7 @@ Use snake_case SQL columns and typed camelCase code fields. Prices are integer c
 
 ## UI rules
 
-Read design.md before frontend changes. Exact cream/chocolate/gold palette, Cormorant Garamond and DM Sans, generous spacing, semantic headings, labeled controls and visible keyboard focus. All breakpoints must work down to 360px. Never fabricate official logos or bakery product photos. Temporary image areas must say photography is pending.
+Read design.md before frontend changes. Owner-configurable palette (cream/chocolate/gold defaults), Cormorant Garamond and DM Sans, generous spacing, semantic headings, labeled controls and visible keyboard focus. All breakpoints must work down to 360px. Never fabricate official logos or bakery product photos. Temporary image areas must say photography is pending.
 
 ## Testing
 
@@ -68,3 +68,5 @@ DATABASE_URL: secret direct PostgreSQL tooling URL. HYPERDRIVE: runtime database
 9. Keep docs aligned with code. Never claim integrations work without validation.
 
 Windows treats agents.md and AGENTS.md as the same filename; this file is the instruction source for both spellings.
+
+Appearance defaults, color validation and derived tokens live in shared/appearance.ts. Preserve palette inheritance and category overrides. Background references must be validated and protected against media deletion. Run the additive category-style migration before deploying customization changes.

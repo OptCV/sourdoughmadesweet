@@ -134,3 +134,7 @@ Confirm the **$5.50 flight price**, required four flavors, muffin pricing, fulfi
 - Image delete rejected: remove all primary/additional references, including archived products, first.
 - Production build missing modules: finish npm install with network access. Do not replace missing libraries with fake shims.
 - Migration failure: inspect the real error, database permissions and backups. Never reset production automatically.
+
+## Brand customization
+
+Run `npm run db:migrate` to apply `0002_workable_hannibal_king.sql` before deploying. No reseed is needed. Settings → Brand & hero edits the global palette and hero copy/background, with an unsaved preview and restore-defaults action. Categories inherit page/primary/accent colors or use custom hex colors and Media-library backgrounds. Upload background images in Media first; detach them from sections before deleting them. Saved colors also theme the owner dashboard. Public pages pick up saved changes on reload, subject to the 30-second catalog cache. See design.md for behavior and accessibility details.

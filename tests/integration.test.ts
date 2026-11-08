@@ -4,6 +4,7 @@ import { connect } from "../server/db/connect";
 import { auth } from "../server/auth";
 import type { Env } from "../server/env";
 import type { Catalog } from "../shared/contracts";
+import { defaultAppearance } from "../shared/appearance";
 import { eq } from "drizzle-orm";
 import * as s from "../server/db/schema";
 const url = process.env.TEST_DATABASE_URL;
@@ -66,6 +67,11 @@ describe.skipIf(!url)(
     afterAll(async () => {
       const { db, pool } = connect(url!);
       try {
+        if (data)
+          await db
+            .update(s.settings)
+            .set({ value: data.settings })
+            .where(eq(s.settings.id, 1));
         if (savedId) {
           await db
             .delete(s.orderItems)
@@ -181,6 +187,122 @@ describe.skipIf(!url)(
       ).toBe(200);
       const publicData = (await (await request("/catalog")).json()) as Catalog;
       expect(publicData.products.some((p) => p.id === productId)).toBe(false);
+    });
+    it("persists branding and rejects missing or still-referenced background media", async () => {
+      const appearance = {
+        ...defaultAppearance,
+        primary: "#193A55",
+        heroHeading: "A new chapter for our bakery",
+      };
+      expect(
+        (
+          await request(
+            "/admin/settings",
+            "PATCH",
+            { ...data.settings, appearance },
+            true,
+          )
+        ).status,
+      ).toBe(200);
+      const updated = (await (await request("/catalog")).json()) as Catalog;
+      expect(updated.settings.appearance).toEqual(appearance);
+      expect(
+        (
+          await request(
+            "/admin/settings",
+            "PATCH",
+            {
+              ...data.settings,
+              appearance: {
+                ...appearance,
+                heroBackground: {
+                  backgroundColor: null,
+                  backgroundImageId: crypto.randomUUID(),
+                },
+              },
+            },
+            true,
+          )
+        ).status,
+      ).toBe(400);
+      const { db, pool } = connect(url!);
+      let imageId = "";
+      try {
+        const [image] = await db
+          .insert(s.media)
+          .values({
+            r2ObjectKey: crypto.randomUUID(),
+            filename: "background.png",
+            mimeType: "image/png",
+            sizeBytes: 100,
+            altText: "Background",
+          })
+          .returning();
+        imageId = image.id;
+        const category = {
+          name: "Visual test",
+          slug: "visual-" + crypto.randomUUID(),
+          theme: "gold",
+          style: { backgroundColor: "#AABBCC", backgroundImageId: imageId },
+          isActive: false,
+        };
+        expect(
+          (
+            await request(
+              `/admin/categories/${categoryId}`,
+              "PATCH",
+              category,
+              true,
+            )
+          ).status,
+        ).toBe(200);
+        expect(
+          (await request(`/admin/media/${imageId}`, "DELETE", undefined, true))
+            .status,
+        ).toBe(409);
+        const admin = (await (
+          await request("/admin/catalog", "GET", undefined, true)
+        ).json()) as Catalog;
+        expect(
+          admin.categories.find((c) => c.id === categoryId)?.style,
+        ).toEqual(category.style);
+        await request(
+          `/admin/categories/${categoryId}`,
+          "PATCH",
+          { ...category, style: null },
+          true,
+        );
+        await request(
+          "/admin/settings",
+          "PATCH",
+          {
+            ...data.settings,
+            appearance: {
+              ...appearance,
+              heroBackground: {
+                backgroundColor: null,
+                backgroundImageId: imageId,
+              },
+            },
+          },
+          true,
+        );
+        expect(
+          (await request(`/admin/media/${imageId}`, "DELETE", undefined, true))
+            .status,
+        ).toBe(409);
+      } finally {
+        await db
+          .update(s.settings)
+          .set({ value: data.settings })
+          .where(eq(s.settings.id, 1));
+        await db
+          .update(s.categories)
+          .set({ style: null })
+          .where(eq(s.categories.id, categoryId));
+        if (imageId) await db.delete(s.media).where(eq(s.media.id, imageId));
+        await pool.end();
+      }
     });
     it("persists an immutable order, survives email failure and deduplicates retries", async () => {
       const p = data.products.find(

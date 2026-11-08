@@ -81,6 +81,23 @@ async function hash(value: string) {
     .map((b) => b.toString(16).padStart(2, "0"))
     .join("");
 }
+async function saveAppearance<T>(
+  db: DB,
+  imageId: string | null | undefined,
+  save: (tx: DB) => Promise<T>,
+) {
+  return db.transaction(async (tx) => {
+    await tx.execute(sql`SELECT pg_advisory_xact_lock(7349831)`);
+    if (imageId) {
+      const [image] = await tx
+        .select()
+        .from(s.media)
+        .where(eq(s.media.id, imageId));
+      if (!image) fail("Choose an image from the media library.");
+    }
+    return save(tx as unknown as DB);
+  });
+}
 async function rate(db: DB, key: string, limit: number) {
   const now = new Date();
   await db.delete(s.rateLimits).where(lt(s.rateLimits.expiresAt, now));
@@ -266,19 +283,27 @@ app.get("/api/admin/products", async (c) =>
 );
 app.post("/api/admin/categories", async (c) => {
   const input = categoryInput.parse(await boundedJson(c.req.raw));
-  return c.json(
-    (await c.get("db").insert(s.categories).values(input).returning())[0],
-    201,
+  const row = await saveAppearance(
+    c.get("db"),
+    input.style?.backgroundImageId,
+    async (db) => (await db.insert(s.categories).values(input).returning())[0],
   );
+  return c.json(row, 201);
 });
 app.patch("/api/admin/categories/:id", async (c) => {
   const input = categoryInput.parse(await boundedJson(c.req.raw));
-  const [row] = await c
-    .get("db")
-    .update(s.categories)
-    .set({ ...input, updatedAt: new Date() })
-    .where(eq(s.categories.id, z.uuid().parse(c.req.param("id"))))
-    .returning();
+  const row = await saveAppearance(
+    c.get("db"),
+    input.style?.backgroundImageId,
+    async (db) =>
+      (
+        await db
+          .update(s.categories)
+          .set({ ...input, updatedAt: new Date() })
+          .where(eq(s.categories.id, z.uuid().parse(c.req.param("id"))))
+          .returning()
+      )[0],
+  );
   if (!row) fail("Category not found", 404);
   return c.json(row);
 });
@@ -381,11 +406,19 @@ app.get("/api/admin/settings", async (c) =>
 );
 app.patch("/api/admin/settings", async (c) => {
   const value = settingsInput.parse(await boundedJson(c.req.raw));
-  await c
-    .get("db")
-    .update(s.settings)
-    .set({ value })
-    .where(eq(s.settings.id, 1));
+  await saveAppearance(
+    c.get("db"),
+    value.appearance?.heroBackground.backgroundImageId,
+    async (db) => {
+      const [existing] = await db
+        .select()
+        .from(s.settings)
+        .where(eq(s.settings.id, 1));
+      // Older clients updating business details must not erase saved branding.
+      value.appearance ??= existing?.value.appearance;
+      await db.update(s.settings).set({ value }).where(eq(s.settings.id, 1));
+    },
+  );
   return c.json(value);
 });
 app.get("/api/admin/orders", async (c) =>
@@ -494,6 +527,15 @@ app.delete("/api/admin/media/:id", async (c) => {
   await c.get("db").transaction(async (tx) => {
     await tx.execute(sql`SELECT pg_advisory_xact_lock(7349831)`);
     const all = await tx.select().from(s.products);
+    const sections = await tx.select().from(s.categories);
+    const config = await tx.select().from(s.settings);
+    if (
+      sections.some((section) => section.style?.backgroundImageId === id) ||
+      config.some(
+        (row) => row.value.appearance?.heroBackground.backgroundImageId === id,
+      )
+    )
+      fail("This image is still used as a site background.", 409);
     if (
       all.some(
         (p) => p.primaryImageId === id || p.additionalImageIds.includes(id),

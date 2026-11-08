@@ -76,6 +76,7 @@ export const categories = pgTable("categories", {
   slug: text("slug").notNull().unique(),
   description: text("description").notNull().default(""),
   theme: text("theme").notNull(),
+  style: jsonb("style").$type<import("../../shared/appearance").SectionStyle>(),
   displayOrder: integer("display_order").notNull().default(0),
   isActive: boolean("is_active").notNull().default(true),
   ...times(),

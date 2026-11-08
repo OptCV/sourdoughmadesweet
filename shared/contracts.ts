@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { appearanceSchema, sectionStyleSchema } from "./appearance";
 export const availability = z.enum([
   "available",
   "sold_out",
@@ -15,6 +16,7 @@ export const categoryInput = z.object({
   slug,
   description: z.string().max(1000).default(""),
   theme: z.enum(["cream", "chocolate", "gold"]),
+  style: sectionStyleSchema.nullable().optional(),
   displayOrder: z.number().int().min(0).default(0),
   isActive: z.boolean().default(true),
 });
@@ -50,6 +52,7 @@ export const flightInput = z.object({
   eligibleProductIds: z.array(z.string().uuid()).max(40),
 });
 export const settingsInput = z.object({
+  appearance: appearanceSchema.optional(),
   displayName: name,
   contactEmail: z.union([z.email(), z.literal("")]),
   contactPhone: z.string().max(40),

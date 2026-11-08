@@ -1,5 +1,16 @@
 # Verification record
 
+## Customization update — November 8, 2026
+
+- Full TypeScript check, Vite production build, ESLint and diff whitespace checks passed.
+- 25 Vitest tests passed, including real PostgreSQL persistence of appearance/category settings, rejection of nonexistent image references, and protection of background images from deletion.
+- Four Playwright tests passed using installed Microsoft Edge (`PLAYWRIGHT_CHANNEL=msedge`): owner settings editing/saving, saved storefront colors/copy, responsive overflow/navigation, and login labels. Browser API fixtures verify UI behavior; PostgreSQL tests independently verify real persistence.
+- Additive migration `0002_workable_hannibal_king.sql` applied successfully to the isolated test database. Apply it to the application database before deployment; no reseed is necessary.
+- Fixed tablet overflow from the decorative hero seal. Tested storefront widths from 360px through 1440px.
+- No production deployment or live Cloudflare/R2/Resend verification was performed in this update.
+
+The initial implementation record below is historical; its dependency/build/browser blockers have been superseded by the checks above.
+
 ## Passed in the development environment
 
 - Pages Functions bundle compiled successfully with Wrangler and nodejs_compat.

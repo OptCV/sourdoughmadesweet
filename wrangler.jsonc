@@ -6,5 +6,5 @@
   "compatibility_flags": ["nodejs_compat"],
   "hyperdrive": [{"binding":"HYPERDRIVE","id":"00000000000000000000000000000000"}],
   "r2_buckets": [{"binding":"PRODUCT_IMAGES","bucket_name":"sourdough-product-images"}],
-  "vars": {"APP_ENV":"production","ORDER_NOTIFICATION_EMAIL":"orders@sourdoughmadesweet.com"}
+  "vars": {"APP_ENV":"production","ORDER_NOTIFICATION_EMAIL":"dev@velazquezdev.com"}
 }

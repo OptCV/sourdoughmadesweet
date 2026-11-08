@@ -8,6 +8,8 @@ Rustic warmth comes from cream paper, natural textures and quiet hospitality. Ed
 
 ## Color system
 
+The original cream, chocolate and gold values below are **defaults**, not restrictions. The owner can replace all three with any six-digit hex colors in Settings → Brand & hero. The saved PostgreSQL configuration is the source of truth; existing stores without appearance settings retain these defaults.
+
 ```css
 :root {
   --color-cream: #fffced;
@@ -56,7 +58,7 @@ Hero is spacious cream with chocolate display text and restrained gold linework.
 
 ## Photography
 
-Use authentic supplied product images in warm natural light. Neutral linen/stone, sourdough crust texture, rich cookie details, subtle shadows, consistent crop, no harsh filters. Do not enlarge menu thumbnails into hero images. Original logo and high-resolution photos were not supplied with the initial repository: use labeled temporary placeholders until owner uploads assets. Hero should eventually use an owner-approved featured product photo.
+Use authentic supplied product images in warm natural light. Neutral linen/stone, sourdough crust texture, rich cookie details, subtle shadows, consistent crop, no harsh filters. Do not enlarge menu thumbnails into hero images. Original logo and high-resolution photos were not supplied with the initial repository: use labeled temporary placeholders until owner uploads assets. The editorial hero photograph uses an owner-approved featured product photo. An optional decorative hero background can also be selected from the Media library.
 
 ## Motion
 
@@ -69,7 +71,7 @@ Smooth anchors, gentle underline/button transitions and selection feedback run 1
 - 768px: two-column products, stacked hero or balanced compact split, two-column form fields.
 - 1024px: desktop nav, two-column hero, three-column products, two-column checkout.
 - 1440px: centered 1240px content, four-column products, full display typography and generous section space.
-  Hero media remains a contained crop, not a full-screen backdrop. Nav and buttons never cause horizontal scroll.
+  The editorial hero photo remains a contained crop. Optional decorative section backgrounds use cover/center cropping behind solid content panels. Nav and buttons never cause horizontal scroll.
 
 ## Accessibility
 
@@ -77,9 +79,9 @@ Semantic landmarks, one H1, sequential headings, skip link, keyboard-complete ac
 
 ## Acceptance checklist
 
-- [ ] Exact palette and required hero copy
+- [ ] Saved owner palette and hero copy applied; original defaults used for older settings
 - [ ] Editorial typography and clear hierarchy
-- [ ] Cream / chocolate / gold section rhythm
+- [ ] Inherited page / primary / accent section rhythm, with deliberate owner overrides
 - [ ] Authentic imagery or explicitly temporary placeholders
 - [ ] No invented logo, geography or business claims
 - [ ] Database-driven category/product content
@@ -87,3 +89,41 @@ Semantic landmarks, one H1, sequential headings, skip link, keyboard-complete ac
 - [ ] All controls keyboard accessible with visible focus
 - [ ] No overflow at 360/390/768/1024/1440px
 - [ ] Owner interface consistent and understandable
+
+## Owner customization and unified branding
+
+### Shared palette
+
+Settings → Brand & hero controls the page background, primary brand color and accent color with labeled color pickers and hex inputs. The full RGB hex range is accepted, including dark page backgrounds. These changes propagate to the storefront, navigation, buttons, forms, product placeholders, order summary, footer, login and owner dashboard. Derived surfaces, dividers, muted text and hover colors follow the shared palette rather than fixed bakery colors. Status colors retain their semantic meaning on explicit high-contrast surfaces.
+
+The legacy CSS variables --color-cream, --color-chocolate and --color-gold now represent the page, primary and accent slots; their names do not constrain saved colors. shared/appearance.ts owns defaults, validation, contrast calculations and derived variables. Do not introduce fixed decorative colors in individual components. Saved changes apply together after Save settings; editing a draft affects only the inline preview. Public catalog caching may take up to 30 seconds to refresh on a new page load.
+
+### Hero content and background
+
+The owner controls the heading (required, up to 160 characters), subheading (optional, 600 characters) and eyebrow (optional, 100 characters). Empty optional copy is omitted. Text is rendered as plain React text, never HTML. Headings may wrap and preserve line breaks; long unbroken text must not overflow on mobile. The original copy remains the default, but exact original wording is no longer a design acceptance requirement.
+
+The hero inherits the page background by default. Owners can enable a custom hex background color, select an uploaded R2 image, combine both, or remove the image. Background photos are decorative, cover the section with centered cropping and sit behind a solid content panel in the selected/inherited color. This preserves readability regardless of image brightness. The editorial product photograph remains separate. Use authentic owner-approved assets; upload them in Media before selecting them as backgrounds.
+
+### Category backgrounds
+
+Category editing offers Page background, Primary brand color and Accent brand color inheritance (stored using the existing cream/chocolate/gold keys for compatibility). It also offers any custom hex color and an optional Media-library background image. Inherited colors change with the global palette; explicit overrides remain independent until the owner turns off Use a custom background color. Category content panels follow the same readability treatment as the hero. Choosing No image returns to a color-only background. Existing category ordering, copy, availability and catalog data remain independent of these visual controls.
+
+### Readability and interaction
+
+Foreground text is selected automatically: use the preferred brand pairing when it reaches WCAG AA 4.5:1; otherwise choose black or white based on contrast. The owner can choose any background without being asked to calculate contrast. Form inputs use the page surface and readable text, while selected flavor tiles use the shared page surface with its corresponding foreground. Focus indicators remain visible. Background panels are opaque; opacity effects must not undermine computed foreground contrast. Review 360, 390, 768, 1024 and 1440px layouts when typography or content lengths change.
+
+### Dashboard workflow and persistence
+
+The settings editor provides an unsaved hero/palette preview and a confirmed Restore original brand & hero action. Restore changes the draft only; Save settings publishes it. Business settings and appearance save together. Category overrides save with the category. Server-side schemas accept only hex colors, bounded plain text and UUID image references—never arbitrary CSS, HTML or external image URLs. Images must exist in the authenticated Media library. Deletion is blocked while any category (including archived categories), product or hero still references the asset; detach it first.
+
+The additive category style migration must be applied before deploying this feature. Hero and global palette data live in the existing business_settings JSON record. No reseeding or destructive reset is required. Older settings remain valid, and older business-settings clients cannot erase an existing appearance configuration simply by omitting it.
+
+### Customization acceptance
+
+- [ ] Owner can edit hero heading, subheading and eyebrow and see the saved text publicly.
+- [ ] Any valid hex palette propagates consistently through the public site and dashboard.
+- [ ] Categories follow the shared palette unless deliberately overridden.
+- [ ] Hero/category image backgrounds retain readable content on mobile and desktop.
+- [ ] Invalid colors and nonexistent media references are rejected server-side.
+- [ ] Referenced background images cannot be deleted.
+- [ ] Draft preview, save errors and restore-default behavior are clear.

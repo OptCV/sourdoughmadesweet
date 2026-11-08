@@ -15,6 +15,13 @@
       "when": 1794086756186,
       "tag": "0001_breezy_cable",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1794176778959,
+      "tag": "0002_workable_hannibal_king",
+      "breakpoints": true
     }
   ]
 }

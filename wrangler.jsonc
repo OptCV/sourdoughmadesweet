@@ -15,7 +15,7 @@
 	"r2_buckets": [
 		{
 			"bucket_name": "sourdough_product_images",
-			"binding": "PRODUCT_IMAGES"
+			"binding": "sourdough_product_images"
 		}
 	],
 	"vars": {

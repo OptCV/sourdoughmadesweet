@@ -1,10 +1,25 @@
 {
-  "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "sourdough-made-sweet",
-  "pages_build_output_dir": "dist",
-  "compatibility_date": "2026-06-01",
-  "compatibility_flags": ["nodejs_compat"],
-  "hyperdrive": [{"binding":"HYPERDRIVE","id":"00000000000000000000000000000000"}],
-  "r2_buckets": [{"binding":"PRODUCT_IMAGES","bucket_name":"sourdough-product-images"}],
-  "vars": {"APP_ENV":"production","ORDER_NOTIFICATION_EMAIL":"dev@velazquezdev.com"}
+	"$schema": "node_modules/wrangler/config-schema.json",
+	"name": "sourdough-made-sweet",
+	"pages_build_output_dir": "dist",
+	"compatibility_date": "2026-06-01",
+	"compatibility_flags": [
+		"nodejs_compat"
+	],
+	"hyperdrive": [
+		{
+			"binding": "HYPERDRIVE",
+			"id": "e19c8a71fd3b478f9588db744c3ce62c"
+		}
+	],
+	"r2_buckets": [
+		{
+			"bucket_name": "sourdough-product-images",
+			"binding": "sourdough_product_images"
+		}
+	],
+	"vars": {
+		"APP_ENV": "production",
+		"ORDER_NOTIFICATION_EMAIL": "dev@velazquezdev.com"
+	}
 }
